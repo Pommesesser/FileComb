@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Archiver {
     private final static int BLOCKSIZE = 16_384;
+    private final static int FILENAMEBLOCKSIZE = 256;
+    private final static int LONGSIZE = 8;
     private final File target;
     private final List<File> sources;
 
@@ -101,6 +103,7 @@ public class Archiver {
     private byte[] digestFile(File file) {
         if (file == null)
             throw new IllegalArgumentException("File is null");
+
         MessageDigest digest;
         try {
             digest = MessageDigest.getInstance("SHA-256");
@@ -124,8 +127,7 @@ public class Archiver {
         if (files == null)
             throw new IllegalArgumentException("File array is null");
 
-        final int longLength = 8;
-        ByteBuffer buffer = ByteBuffer.allocate(longLength + longLength * files.length);
+        ByteBuffer buffer = ByteBuffer.allocate(LONGSIZE + LONGSIZE * files.length);
         buffer.putLong(files.length);
         for (File file : files)
             buffer.putLong(file.length());
@@ -137,6 +139,6 @@ public class Archiver {
         if (file == null)
             throw new IllegalArgumentException("File is null");
 
-        ByteBuffer buffer = ByteBuffer.allocate();
+        ByteBuffer buffer = ByteBuffer.allocate(LONGSIZE + FILENAMEBLOCKSIZE);
     }
 }
